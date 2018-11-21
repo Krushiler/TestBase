@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChangeTestActivity">
+    tools:context=".ChangeSlovariActivity">
 
     <Button
         android:id="@+id/buttonbiology"
@@ -13,10 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_marginStart="0dp"
         android:background="@android:color/darker_gray"
-        android:onClick="onClickSubject"
-        android:text="Биология" />
+        android:onClick="onClickChangedSlovar"
+        android:text="Биология"/>
 
     <Button
         android:id="@+id/buttonchemistry"
@@ -24,8 +22,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/buttonbiology"
         android:layout_alignParentStart="true"
+        android:layout_marginStart="0dp"
         android:layout_marginTop="10dp"
-        android:onClick="onClickSubject"
         android:background="@android:color/darker_gray"
+        android:onClick="onClickChangedSlovar"
         android:text="Химия" />
 </RelativeLayout>
