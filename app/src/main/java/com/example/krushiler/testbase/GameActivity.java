@@ -20,15 +20,18 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity {
     int  o = 0, sch = 0, otv; // sch - counter    o - marks   otv - right answer
-    final static int COUNT_OF_QUESTIONS = 14; // 15 because array begin from 0
+    final static int COUNT_OF_QUESTIONS = 15;
     //final MediaPlayer rightAnswer = MediaPlayer.create(this, R.raw.rightanswersound);
     List<String> whatRandom = new ArrayList();
     List<String> allArray = new ArrayList();
-    Random rand, rand1, rand2, randseed;
-    int b1, b2, b3, seed;
+    Random rand = new Random(), rand1  = new Random(), rand2  = new Random(), randseed = new Random();
+    int b1, b2, b3;
+    long seed=1;
     boolean b = false;
     int n, rv;
     Bundle extras;
@@ -36,11 +39,12 @@ public class GameActivity extends AppCompatActivity {
     TextView voprTV, failsTV, schTV;
     File jsonFile = new File(Environment.getDataDirectory(), "");
     Intent intent;
-
+    Timer timer = new Timer();
     private static final Object sMonitor = new Object();
     JSONObject jsonObject = new JSONObject();
     JSONArray jsonArray = new JSONArray();
     String[] s;
+    int countTime = 0;
     String extrasString;
     public String loadJSONFromAsset() {
         String json = null;
@@ -62,6 +66,7 @@ public class GameActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
         extras = getIntent().getExtras();
+
         extrasString = extras.getString("name");
         intent = getIntent();
         extrasString = intent.getStringExtra("name");
@@ -88,18 +93,24 @@ public class GameActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                countTime++;
+            }
+        }, 1);
         bo1 = (Button) findViewById(R.id.button1a);
         bo2 = (Button) findViewById(R.id.button2a);
         bo3 = (Button) findViewById(R.id.button3a);
         voprTV = (TextView) findViewById(R.id.tvquestion);
         failsTV = (TextView) findViewById(R.id.fails);
         schTV = (TextView) findViewById(R.id.tvsch);
+        timer.purge();
         writeText();
-        randseed = new Random();
-        seed = randseed.nextInt();
     }
     public void writeText(){
+        randseed = new Random();
+        seed = randseed.nextLong();
         rand.setSeed(seed);
         rand1.setSeed(seed);
         rand2.setSeed(seed);
@@ -185,6 +196,7 @@ public class GameActivity extends AppCompatActivity {
             }else{
                 Intent i = new Intent(this, WinActivity.class);
                 i.putExtra("mistakes", o);
+                i.putExtra("time", Integer.toString(countTime));
                 startActivity(i);
                 finish();
             }

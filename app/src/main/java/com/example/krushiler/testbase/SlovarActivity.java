@@ -26,7 +26,6 @@ public class SlovarActivity extends AppCompatActivity {
     String string = "", extrasString;
     ArrayList<HashMap<String, String>> myArrList;
     ListView lv;
-    HashMap<String, String> map;
     public String loadJSONFromAsset() {
         String json = null;
         try {
@@ -48,7 +47,7 @@ public class SlovarActivity extends AppCompatActivity {
         setContentView(R.layout.activity_slovar);
         myArrList = new ArrayList<HashMap<String, String>>();
         SimpleAdapter adapter;
-        map = new HashMap<String, String>();
+
 
         lv = (ListView) findViewById(R.id.listViewSlovar);
         extras = getIntent().getExtras();
@@ -76,10 +75,13 @@ public class SlovarActivity extends AppCompatActivity {
                 new String[]{"q", "a"},
                 new int[]{R.id.text1, R.id.text2});
         for (int i = 0; i < s.length; i+=2) {
+            HashMap<String, String> map;
+            map = new HashMap<String, String>();
             map.put("q", s[i]);
-            map.put("a", "- " + s[i + 1]);
+            map.put("a", s[i + 1]);
             myArrList.add(map);
         }
+        adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
     }
 }
