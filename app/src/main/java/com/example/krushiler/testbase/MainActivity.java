@@ -24,4 +24,8 @@ public class MainActivity extends AppCompatActivity {
         Intent i = new Intent(this, ChangeSlovariActivity.class);
         startActivity(i);
     }
+    public void onClickNetworkGame(View v){
+        Intent i = new Intent(this, ChangeTestNetActivity.class);
+        startActivity(i);
+    }
 }

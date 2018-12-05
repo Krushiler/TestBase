@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -11,24 +14,32 @@
         />
 
     <Button
+        android:layout_width="236dp"
+        android:layout_height="wrap_content"
+        android:text="Игра"
+        android:layout_centerHorizontal="true"
+        android:onClick="onClickNetworkGame"
+        android:layout_marginBottom="114dp"
+        android:background="@android:color/darker_gray"
+        android:layout_alignBottom="@id/start"
+        />
+
+    <Button
         android:id="@+id/start"
         android:layout_width="236dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="170dp"
+        android:layout_centerInParent="true"
         android:background="@android:color/darker_gray"
         android:onClick="onClickStart"
-        android:text="Одиночка" />
+        android:text="Тренировка" />
 
     <Button
         android:id="@+id/buttonslovari"
         android:layout_width="236dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/start"
-        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@id/start"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="114dp"
+        android:layout_marginTop="114dp"
         android:background="@android:color/darker_gray"
         android:onClick="onClickSlovari"
         android:text="Словари" />

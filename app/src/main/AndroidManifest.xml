@@ -4,8 +4,8 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission
-        android:required="true"
-        android:name="android.permission.ACCESS_WIFI_STATE"/>
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -25,7 +25,10 @@
         <activity android:name=".WinActivity" />
         <activity android:name=".ChangeTestActivity" />
         <activity android:name=".ChangeSlovariActivity" />
-        <activity android:name=".SlovarActivity"></activity>
+        <activity android:name=".SlovarActivity" />
+        <activity android:name=".NetworkGameActivity" />
+        <activity android:name=".ChangeTestNetActivity" />
+        <activity android:name=".GameNetActivity"></activity>
     </application>
 
 </manifest>

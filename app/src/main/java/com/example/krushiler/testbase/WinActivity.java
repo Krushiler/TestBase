@@ -25,10 +25,10 @@ public class WinActivity extends AppCompatActivity {
                 "HH:mm:ss", Locale.getDefault());
         String strDate = i.getStringExtra("time");
 
-        tvtime = (TextView) findViewById(R.id.tvtime);
+//        tvtime = (TextView) findViewById(R.id.tvtime);
         tv =(TextView) findViewById(R.id.textView);
 
-        tvtime.setText(strDate);
+//        tvtime.setText(strDate);
         tv.setText("Ошибки: " + Integer.toString(i.getIntExtra("mistakes", 0)));
     }
 }
