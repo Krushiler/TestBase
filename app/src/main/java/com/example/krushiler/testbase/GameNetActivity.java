@@ -41,6 +41,7 @@ public class GameNetActivity extends AppCompatActivity {
     private static final Object sMonitor = new Object();
     JSONObject jsonObject = new JSONObject();
     JSONArray jsonArray = new JSONArray();
+    //
     String[] s;
     NetworkGameActivity nga = new NetworkGameActivity();
     int countTime = 0;
