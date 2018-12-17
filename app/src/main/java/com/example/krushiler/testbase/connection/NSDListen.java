@@ -154,6 +154,8 @@ public class NSDListen {
             }).start();
         }
 
+        String message;
+
         public void listenForMessages() {
             if (!mIsReady || mSocketInput == null) return;
             int bufferSize = 1024;
@@ -169,11 +171,10 @@ public class NSDListen {
                 final String receivedMessage = sb.toString();
                 mSocketOutput.write(("Echo: " + receivedMessage).getBytes());
                 mSocketOutput.flush();
-                //TODO:Send message on the main thread, Note: We don't need to create a handler every time, this is just for prototyping...
                 new Handler(mContext.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(mContext, "Message received: " + receivedMessage, Toast.LENGTH_LONG).show();
+                        message = receivedMessage;
                     }
                 });
             } catch (IOException e) {e.printStackTrace();}

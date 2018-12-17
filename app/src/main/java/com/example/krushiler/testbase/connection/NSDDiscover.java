@@ -54,51 +54,16 @@ public class NSDDiscover {
 
         new SocketConnection().sayHello(mHostFound, mPortFound);
     }
-    Socket mSocket;
-    String seed;
+    public void saySeedForTest(long getSeed){
+        if(mHostFound == null || mPortFound <= 0){
+            Toast.makeText(mContext, "Devices not found", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-    public void saySeedForTest(final String host, final int port, String getSeed){
-        seed = getSeed;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mSocket = new Socket();
-                SocketAddress address = new InetSocketAddress(host, port);
-                try {
-                    android.util.Log.e("TrackingFlow", "Trying to connect to: " + host);
-                    mSocket.connect(address);
-                    DataOutputStream os = new DataOutputStream(mSocket.getOutputStream());
-                    DataInputStream is = new DataInputStream(mSocket.getInputStream());
-                    //Send a message...
-                    os.write(seed.getBytes());
-                    os.flush();
-                    android.util.Log.e("TrackingFlow", "Message SENT!!!");
-
-                    //Read the message
-                    int bufferSize = 1024;
-                    byte[] buffer = new byte[bufferSize];
-                    StringBuilder sb = new StringBuilder();
-                    int length = Integer.MAX_VALUE;
-                    try {
-                        while (length >= bufferSize) {
-                            length = is.read(buffer);
-                            sb.append(new String(buffer, 0, length));
-                        }
-                        final String receivedMessage = sb.toString();
-                        new Handler(mContext.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext, "Message received: " + receivedMessage, Toast.LENGTH_LONG).show();
-                            }
-                        });
-                    } catch (Exception e) {e.printStackTrace();}
-                    os.close();
-                    is.close();
-
-                } catch (IOException e) {e.printStackTrace();}
-            }
-        }).start();
+        new SocketConnection().saySeedForTest(mHostFound, mPortFound, getSeed);
     }
+    Socket mSocket;
+    long seed;
 
     NsdManager.ResolveListener mResolveListener = new NsdManager.ResolveListener() {
         @Override
@@ -172,6 +137,49 @@ public class NSDDiscover {
                 }
             }).start();
         }
+        public void saySeedForTest(final String host, final int port, long getSeed){
+            seed = getSeed;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mSocket = new Socket();
+                    SocketAddress address = new InetSocketAddress(host, port);
+                    try {
+                        android.util.Log.e("TrackingFlow", "Trying to connect to: " + host);
+                        mSocket.connect(address);
+                        DataOutputStream os = new DataOutputStream(mSocket.getOutputStream());
+                        DataInputStream is = new DataInputStream(mSocket.getInputStream());
+                        //Send a message...
+                        os.write(Long.toString(seed).getBytes());
+                        os.flush();
+                        android.util.Log.e("TrackingFlow", "Message SENT!!!");
+
+                        //Read the message
+                        int bufferSize = 1024;
+                        byte[] buffer = new byte[bufferSize];
+                        StringBuilder sb = new StringBuilder();
+                        int length = Integer.MAX_VALUE;
+                        try {
+                            while (length >= bufferSize) {
+                                length = is.read(buffer);
+                                sb.append(new String(buffer, 0, length));
+                            }
+                            final String receivedMessage = sb.toString();
+                            new Handler(mContext.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(mContext, "Message received: " + receivedMessage, Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        } catch (Exception e) {e.printStackTrace();}
+                        os.close();
+                        is.close();
+
+                    } catch (IOException e) {e.printStackTrace();}
+                }
+            }).start();
+        }
+
     }
 
     private NsdManager.DiscoveryListener mDiscoveryListener = new NsdManager.DiscoveryListener() {
