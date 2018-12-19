@@ -79,7 +79,7 @@ public class GameNetActivity extends AppCompatActivity {
             extrasString = extras.getString("name");
             extrasString = intent.getStringExtra("name");
         }else{
-
+            
         }
         try {
             jsonObject = new JSONObject(loadJSONFromAsset());

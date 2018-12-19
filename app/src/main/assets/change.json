@@ -2,6 +2,7 @@
   "array":[
     "Биология", "biology.json",
     "Химия", "chemistry.json",
-    "Обществознание", "social.json"
+    "Обществознание", "social.json",
+    "Физика", "physics.json"
   ]
 }
