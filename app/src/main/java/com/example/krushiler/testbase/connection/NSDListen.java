@@ -104,10 +104,25 @@ public class NSDListen {
      * This class has the functionality required to start
      * and use the ServerSocket...
      */
+    String fileMessage = "NO", seedMessage = "NO";
+
+    public String getFileMessage() {
+        return fileMessage;
+    }
+
+    public String getSeedMessage() {
+        return seedMessage;
+    }
+
+    public void listenSeed(){
+    }
+
     private class SocketServerConnection {
         private boolean mIsReady;
         private DataOutputStream mSocketOutput;
         private DataInputStream mSocketInput;
+
+
 
         public SocketServerConnection(){
             try{
@@ -154,8 +169,6 @@ public class NSDListen {
             }).start();
         }
 
-        String message;
-
         public void listenForMessages() {
             if (!mIsReady || mSocketInput == null) return;
             int bufferSize = 1024;
@@ -174,7 +187,31 @@ public class NSDListen {
                 new Handler(mContext.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
-                        message = receivedMessage;
+                        fileMessage = receivedMessage;
+                    }
+                });
+            } catch (IOException e) {e.printStackTrace();}
+        }
+
+        public void listenForMessagesSeed() {
+            if (!mIsReady || mSocketInput == null) return;
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
+            StringBuilder sb = new StringBuilder();
+            int length = Integer.MAX_VALUE;
+
+            try {
+                while (length >= bufferSize) {
+                    length = mSocketInput.read(buffer);
+                    sb.append(new String(buffer, 0, length));
+                }
+                final String receivedMessage = sb.toString();
+                mSocketOutput.write(("Echo: " + receivedMessage).getBytes());
+                mSocketOutput.flush();
+                new Handler(mContext.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        seedMessage = receivedMessage;
                     }
                 });
             } catch (IOException e) {e.printStackTrace();}

@@ -197,6 +197,7 @@ public class GameActivity extends AppCompatActivity {
                 Intent i = new Intent(this, WinActivity.class);
                 i.putExtra("mistakes", o);
                 i.putExtra("time", Integer.toString(countTime));
+                i.putExtra("onlineMode", "offline");
                 startActivity(i);
                 finish();
             }

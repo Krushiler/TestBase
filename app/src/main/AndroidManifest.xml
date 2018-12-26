@@ -27,8 +27,6 @@
         <activity android:name=".ChangeSlovariActivity" />
         <activity android:name=".SlovarActivity" />
         <activity android:name=".NetworkGameActivity" />
-        <activity android:name=".ChangeTestNetActivity" />
-        <activity android:name=".GameNetActivity"></activity>
     </application>
 
 </manifest>

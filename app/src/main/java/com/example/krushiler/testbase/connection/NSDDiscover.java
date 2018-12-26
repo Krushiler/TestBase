@@ -41,29 +41,34 @@ public class NSDDiscover {
 
     public void discoverServices() {
         if(mCurrentDiscoveryStatus == DISCOVERY_STATUS.ON)return;
-        Toast.makeText(mContext, "Discover SERVICES!", Toast.LENGTH_LONG).show();
+        Toast.makeText(mContext, "Discover SERVICES!", Toast.LENGTH_SHORT).show();
         mCurrentDiscoveryStatus = DISCOVERY_STATUS.ON;
         mNsdManager.discoverServices(Constants.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
     }
 
     public void sayHello(){
         if(mHostFound == null || mPortFound <= 0){
-            Toast.makeText(mContext, "Devices not found", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, "Devices not found", Toast.LENGTH_SHORT).show();
             return;
         }
 
         new SocketConnection().sayHello(mHostFound, mPortFound);
     }
-    public void saySeedForTest(long getSeed){
-        if(mHostFound == null || mPortFound <= 0){
-            Toast.makeText(mContext, "Devices not found", Toast.LENGTH_LONG).show();
+    public void sayString(String getSeed){
+        if(mHostFound == null){
+            Toast.makeText(mContext, "DEVICE NO HOST", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(mPortFound <= 0){
+            Toast.makeText(mContext, "DEVICE NO PORT", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        new SocketConnection().saySeedForTest(mHostFound, mPortFound, getSeed);
+
+        new SocketConnection().sayString(mHostFound, mPortFound, getSeed);
     }
     Socket mSocket;
-    long seed;
+    String message;
 
     NsdManager.ResolveListener mResolveListener = new NsdManager.ResolveListener() {
         @Override
@@ -137,8 +142,8 @@ public class NSDDiscover {
                 }
             }).start();
         }
-        public void saySeedForTest(final String host, final int port, long getSeed){
-            seed = getSeed;
+        public void sayString(final String host, final int port, String msg){
+            message = msg;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -150,7 +155,7 @@ public class NSDDiscover {
                         DataOutputStream os = new DataOutputStream(mSocket.getOutputStream());
                         DataInputStream is = new DataInputStream(mSocket.getInputStream());
                         //Send a message...
-                        os.write(Long.toString(seed).getBytes());
+                        os.write(message.getBytes());
                         os.flush();
                         android.util.Log.e("TrackingFlow", "Message SENT!!!");
 
@@ -167,9 +172,7 @@ public class NSDDiscover {
                             final String receivedMessage = sb.toString();
                             new Handler(mContext.getMainLooper()).post(new Runnable() {
                                 @Override
-                                public void run() {
-                                    Toast.makeText(mContext, "Message received: " + receivedMessage, Toast.LENGTH_LONG).show();
-                                }
+                                public void run() { }
                             });
                         } catch (Exception e) {e.printStackTrace();}
                         os.close();
