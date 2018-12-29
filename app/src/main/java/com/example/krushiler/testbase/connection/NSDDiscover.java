@@ -27,6 +27,7 @@ public class NSDDiscover {
     private String mHostFound;
     private int mPortFound;
     private DISCOVERY_STATUS mCurrentDiscoveryStatus = DISCOVERY_STATUS.OFF;
+    private NsdServiceInfo mNSDServiceInfo = new NsdServiceInfo();
 
     private enum DISCOVERY_STATUS{
         ON,
@@ -69,6 +70,8 @@ public class NSDDiscover {
     }
     Socket mSocket;
     String message;
+    String mHost;
+    int mPort;
 
     NsdManager.ResolveListener mResolveListener = new NsdManager.ResolveListener() {
         @Override
@@ -85,6 +88,8 @@ public class NSDDiscover {
                 return;
             }
             Toast.makeText(mContext, "FOUND A CONNECTION!", Toast.LENGTH_LONG).show();
+            mHost = mNSDServiceInfo.getHost().toString();
+            mPort = mNSDServiceInfo.getPort();
             mNsdManager.stopServiceDiscovery(mDiscoveryListener);//TODO: You can remove this line if necessary, that way the discovery process continues...
             setHostAndPortValues(serviceInfo);
             if(mListener != null){
@@ -150,7 +155,8 @@ public class NSDDiscover {
                     mSocket = new Socket();
                     SocketAddress address = new InetSocketAddress(host, port);
                     try {
-                        android.util.Log.e("TrackingFlow", "Trying to connect to: " + host);
+                        android.util.Log.e(
+                                "TrackingFlow", "Trying to connect to: " + host);
                         mSocket.connect(address);
                         DataOutputStream os = new DataOutputStream(mSocket.getOutputStream());
                         DataInputStream is = new DataInputStream(mSocket.getInputStream());

@@ -3,6 +3,7 @@
     "Биология", "biology.json",
     "Химия", "chemistry.json",
     "Обществознание", "social.json",
-    "Физика", "physics.json"
+    "Физика", "physics.json",
+    "Математика", "maths.json"
   ]
 }
