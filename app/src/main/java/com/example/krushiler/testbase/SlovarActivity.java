@@ -3,7 +3,12 @@ package com.example.krushiler.testbase;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -27,6 +32,9 @@ public class SlovarActivity extends AppCompatActivity {
     String string = "", extrasString;
     ArrayList<HashMap<String, String>> myArrList;
     ListView lv;
+    EditText et;
+    Toolbar toolbar;
+
     public String loadJSONFromAsset() {
         String json = null;
         try {
@@ -48,7 +56,6 @@ public class SlovarActivity extends AppCompatActivity {
         setContentView(R.layout.activity_slovar);
         myArrList = new ArrayList<HashMap<String, String>>();
         SimpleAdapter adapter;
-
 
         lv = (ListView) findViewById(R.id.listViewSlovar);
         extras = getIntent().getExtras();
@@ -84,5 +91,49 @@ public class SlovarActivity extends AppCompatActivity {
         }
         adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        et = (EditText) findViewById(R.id.findET);
+        et.setEnabled(false);
+        et.setEnabled(true);
+        et.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence sa, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable sa) {
+                int index = lv.getFirstVisiblePosition();
+                View v = lv.getChildAt(0);
+                int top = (v == null) ? 0 : (v.getTop() - lv.getPaddingTop());
+                boolean b = true;
+                String etText = et.getText().toString();
+                for (int i = 0; i < s.length; i += 2){
+                    b = true;
+                    if (etText.length()<=s[i].charAt(i)) {
+                        for (int j = 0; j < etText.length(); j++) {
+                            if (Character.toLowerCase(etText.charAt(j)) == Character.toLowerCase(s[i].charAt(j))) {
+                                continue;
+                            } else {
+                                b = false;
+                                break;
+                            }
+                        }
+                        if (b) {
+                            lv.setSelectionFromTop(i, top);
+                            Log.d("aaaa", s[i]);
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+
     }
 }

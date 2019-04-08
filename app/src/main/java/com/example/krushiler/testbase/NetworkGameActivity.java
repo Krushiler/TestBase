@@ -1,8 +1,11 @@
 package com.example.krushiler.testbase;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,9 +18,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.example.krushiler.testbase.connection.NSDDiscover;
-import com.example.krushiler.testbase.connection.NSDListen;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,13 +64,12 @@ public class NetworkGameActivity extends AppCompatActivity {
     ArrayList<String> myArrList;
     ListView lv;
 
-
-    public NSDDiscover mNSDDiscover;
-    public NSDListen mNSDListener;
-
     private Button mRegisterBtn;
     private Button mDiscoverBtn;
     private Button mSayHelloBtn;
+
+    WifiP2pManager.Channel channel;
+    WifiP2pManager manager;
 
     RelativeLayout changeRL, gameRL, networkRL;
 
@@ -82,18 +81,12 @@ public class NetworkGameActivity extends AppCompatActivity {
         changeRL = (RelativeLayout) findViewById(R.id.changelayout);
         gameRL = (RelativeLayout) findViewById(R.id.gamelayout);
         networkRL = (RelativeLayout) findViewById(R.id.networklayout);
-
-        mNSDListener = new NSDListen(this);
-        mNSDDiscover = new NSDDiscover(this, mDiscoveryListener);
         mRegisterBtn = (Button) findViewById(R.id.register);
         mRegisterBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mNSDListener.registerDevice();
                 findViewById(R.id.discover).setEnabled(false);
                 extrasWho = "host";
-                changeRL.setVisibility(View.VISIBLE);
-                networkRL.setVisibility(View.GONE);
             }
         });
 
@@ -101,8 +94,9 @@ public class NetworkGameActivity extends AppCompatActivity {
         mDiscoverBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mNSDDiscover.discoverServices();
                 mRegisterBtn.setEnabled(false);
+                changeRL.setVisibility(View.VISIBLE);
+                networkRL.setVisibility(View.GONE);
                 extrasWho = "client";
             }
         });
@@ -140,18 +134,13 @@ public class NetworkGameActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 fileName = s[position * 2 + 1];
                 onClickChangedGame();
-                mNSDDiscover.sayString(s[position * 2 + 1]);
                 changeRL.setVisibility(View.GONE);
                 networkRL.setVisibility(View.GONE);
                 gameRL.setVisibility(View.VISIBLE);
                 initializeGame();
             }
         });
-        if (extrasWho == "client"){
-            while (mNSDListener.getFileMessage()=="NO"){}
-            fileName = mNSDListener.getFileMessage();
-            while (mNSDListener.getFileMessage()==fileName){}
-            seed = Integer.parseInt(mNSDListener.getFileMessage());
+        if (extrasWho == "host"){
             changeRL.setVisibility(View.GONE);
             networkRL.setVisibility(View.GONE);
             initializeGame();
@@ -159,22 +148,9 @@ public class NetworkGameActivity extends AppCompatActivity {
         }
     }
 
-    private NSDDiscover.DiscoveryListener mDiscoveryListener = new NSDDiscover.DiscoveryListener() {
-        @Override
-        public void serviceDiscovered(String host, int port) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                }
-            });
-        }
-    };
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mNSDListener.shutdown();
-        mNSDDiscover.shutdown();
     }
     public String loadJSONFromAsset() {
         String json = null;
@@ -212,10 +188,9 @@ public class NetworkGameActivity extends AppCompatActivity {
     public void initializeGame(){
         randseed = new Random();
         extrasString = fileName;
-        if (extrasWho == "host") {
+        if (extrasWho == "client") {
             randseed = new Random();
             seed = randseed.nextLong();
-            mNSDDiscover.sayString(Long.toString(seed));
         }
         try {
             jsonObject = new JSONObject(loadJSONFromAsset());

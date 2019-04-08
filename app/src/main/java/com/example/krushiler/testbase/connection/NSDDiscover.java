@@ -17,6 +17,9 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
+/**
+ * Created by martincazares on 3/10/15.
+ */
 public class NSDDiscover {
 
     public static final String TAG = "TrackingFlow";
@@ -27,7 +30,6 @@ public class NSDDiscover {
     private String mHostFound;
     private int mPortFound;
     private DISCOVERY_STATUS mCurrentDiscoveryStatus = DISCOVERY_STATUS.OFF;
-    private NsdServiceInfo mNSDServiceInfo = new NsdServiceInfo();
 
     private enum DISCOVERY_STATUS{
         ON,
@@ -42,36 +44,19 @@ public class NSDDiscover {
 
     public void discoverServices() {
         if(mCurrentDiscoveryStatus == DISCOVERY_STATUS.ON)return;
-        Toast.makeText(mContext, "Discover SERVICES!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(mContext, "Discover SERVICES!", Toast.LENGTH_LONG).show();
         mCurrentDiscoveryStatus = DISCOVERY_STATUS.ON;
         mNsdManager.discoverServices(Constants.SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, mDiscoveryListener);
     }
 
     public void sayHello(){
         if(mHostFound == null || mPortFound <= 0){
-            Toast.makeText(mContext, "Devices not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, mContext.getString(R.string.devices_not_found_toast), Toast.LENGTH_LONG).show();
             return;
         }
 
         new SocketConnection().sayHello(mHostFound, mPortFound);
     }
-    public void sayString(String getSeed){
-        if(mHostFound == null){
-            Toast.makeText(mContext, "DEVICE NO HOST", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if(mPortFound <= 0){
-            Toast.makeText(mContext, "DEVICE NO PORT", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-
-        new SocketConnection().sayString(mHostFound, mPortFound, getSeed);
-    }
-    Socket mSocket;
-    String message;
-    String mHost;
-    int mPort;
 
     NsdManager.ResolveListener mResolveListener = new NsdManager.ResolveListener() {
         @Override
@@ -88,8 +73,6 @@ public class NSDDiscover {
                 return;
             }
             Toast.makeText(mContext, "FOUND A CONNECTION!", Toast.LENGTH_LONG).show();
-            mHost = mNSDServiceInfo.getHost().toString();
-            mPort = mNSDServiceInfo.getPort();
             mNsdManager.stopServiceDiscovery(mDiscoveryListener);//TODO: You can remove this line if necessary, that way the discovery process continues...
             setHostAndPortValues(serviceInfo);
             if(mListener != null){
@@ -147,48 +130,6 @@ public class NSDDiscover {
                 }
             }).start();
         }
-        public void sayString(final String host, final int port, String msg){
-            message = msg;
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    mSocket = new Socket();
-                    SocketAddress address = new InetSocketAddress(host, port);
-                    try {
-                        android.util.Log.e(
-                                "TrackingFlow", "Trying to connect to: " + host);
-                        mSocket.connect(address);
-                        DataOutputStream os = new DataOutputStream(mSocket.getOutputStream());
-                        DataInputStream is = new DataInputStream(mSocket.getInputStream());
-                        //Send a message...
-                        os.write(message.getBytes());
-                        os.flush();
-                        android.util.Log.e("TrackingFlow", "Message SENT!!!");
-
-                        //Read the message
-                        int bufferSize = 1024;
-                        byte[] buffer = new byte[bufferSize];
-                        StringBuilder sb = new StringBuilder();
-                        int length = Integer.MAX_VALUE;
-                        try {
-                            while (length >= bufferSize) {
-                                length = is.read(buffer);
-                                sb.append(new String(buffer, 0, length));
-                            }
-                            final String receivedMessage = sb.toString();
-                            new Handler(mContext.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() { }
-                            });
-                        } catch (Exception e) {e.printStackTrace();}
-                        os.close();
-                        is.close();
-
-                    } catch (IOException e) {e.printStackTrace();}
-                }
-            }).start();
-        }
-
     }
 
     private NsdManager.DiscoveryListener mDiscoveryListener = new NsdManager.DiscoveryListener() {

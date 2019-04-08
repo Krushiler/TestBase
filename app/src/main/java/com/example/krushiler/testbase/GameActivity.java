@@ -2,6 +2,7 @@ package com.example.krushiler.testbase;
 
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,7 +37,7 @@ public class GameActivity extends AppCompatActivity {
     int n, rv;
     Bundle extras;
     Button bo1, bo2, bo3;
-    TextView voprTV, failsTV, schTV;
+    TextView voprTV, failsTV, schTV, timeTV;
     File jsonFile = new File(Environment.getDataDirectory(), "");
     Intent intent;
     Timer timer = new Timer();
@@ -45,6 +46,7 @@ public class GameActivity extends AppCompatActivity {
     JSONArray jsonArray = new JSONArray();
     String[] s;
     int countTime = 0;
+    int countTimeSec;
     String extrasString;
     public String loadJSONFromAsset() {
         String json = null;
@@ -77,6 +79,7 @@ public class GameActivity extends AppCompatActivity {
         }
         try {
             jsonArray = jsonObject.getJSONArray("array");
+
             Log.d("JsonSIZE", Integer.toString(jsonArray.length()));
             s=new String[jsonArray.length()];
             Log.d("RandomSIZE", Integer.toString(s.length));
@@ -93,19 +96,25 @@ public class GameActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                countTime++;
-            }
-        }, 1);
         bo1 = (Button) findViewById(R.id.button1a);
         bo2 = (Button) findViewById(R.id.button2a);
         bo3 = (Button) findViewById(R.id.button3a);
         voprTV = (TextView) findViewById(R.id.tvquestion);
         failsTV = (TextView) findViewById(R.id.fails);
         schTV = (TextView) findViewById(R.id.tvsch);
-        timer.purge();
+        timeTV = (TextView) findViewById(R.id.time);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                countTime+=1;
+                timeTV.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        timeTV.setText(Integer.toString(countTime));
+                    }
+                });
+            }
+        }, 0, 1000);
         writeText();
     }
     public void writeText(){
@@ -128,7 +137,6 @@ public class GameActivity extends AppCompatActivity {
 
         voprTV.setText(allArray.get(rv*2+1));
         otv = rand.nextInt(3)+1;
-
 
         setTextOnButtons();
         whatRandom.remove(rv);
@@ -196,7 +204,7 @@ public class GameActivity extends AppCompatActivity {
             }else{
                 Intent i = new Intent(this, WinActivity.class);
                 i.putExtra("mistakes", o);
-                i.putExtra("time", Integer.toString(countTime));
+                i.putExtra("time", Double.toString(countTime));
                 i.putExtra("onlineMode", "offline");
                 startActivity(i);
                 finish();
