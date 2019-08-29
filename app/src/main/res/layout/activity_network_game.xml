@@ -17,6 +17,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="120dp"
         android:background="@android:color/darker_gray"
+        android:onClick="hostGame"
         android:text="Хост" />
 
     <Button
@@ -26,16 +27,9 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:background="@android:color/darker_gray"
+        android:onClick="findOpponent"
         android:text="Поиск" />
 
-    <Button
-        android:id="@+id/sayHello"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@id/discover"
-        android:text="sayHello"
-        android:visibility="gone"/>
     </RelativeLayout>
     <RelativeLayout
         android:layout_height="match_parent"
