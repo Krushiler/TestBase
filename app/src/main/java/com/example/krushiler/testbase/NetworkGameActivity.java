@@ -769,7 +769,7 @@ public class NetworkGameActivity extends AppCompatActivity {
             sendMessage(Long.toString(seed));
         }
         final int[] nowTime = {4};
-        whatTestTV.setText(fnameforclient);
+        whatTestTV.setText(fnameforclient+"\n\n" + COUNT_OF_QUESTIONS + " вопросов");
         countDownTV.setText("3");
         CountDownTimer waitTimer;
         waitTimer = new CountDownTimer(2500, 700) {
