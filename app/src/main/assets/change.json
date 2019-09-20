@@ -5,6 +5,8 @@
     "Обществознание", "social.json",
     "Физика (углубленная)", "physics.json",
     "Математика (углубленная)", "maths.json",
-    "Информатика", "computer.json"
+    "Информатика", "computer.json",
+    "Астрономия", "astronomy.json",
+    "География (столицы)", "geography_stol.json"
   ]
 }

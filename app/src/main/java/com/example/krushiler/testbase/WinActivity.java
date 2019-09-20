@@ -21,15 +21,12 @@ public class WinActivity extends AppCompatActivity {
         setContentView(R.layout.activity_win);
         Intent i = getIntent();
 
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
-                "HH:mm:ss", Locale.getDefault());
         String strDate = i.getStringExtra("time");
 
-//        tvtime = (TextView) findViewById(R.id.tvtime);
+        tvtime = (TextView) findViewById(R.id.textViewTime);
         tv =(TextView) findViewById(R.id.textView);
 
-//        tvtime.setText(strDate);
+        tvtime.setText("Время: "+strDate);
         tv.setText("Ошибки: " + Integer.toString(i.getIntExtra("mistakes", 0)));
     }
 }

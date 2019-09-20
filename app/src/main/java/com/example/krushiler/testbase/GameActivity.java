@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,7 +30,7 @@ import java.util.TimerTask;
 
 public class GameActivity extends AppCompatActivity {
     int  o = 0, sch = 0, otv; // sch - counter    o - marks   otv - right answer
-    final static int COUNT_OF_QUESTIONS = 15;
+    int COUNT_OF_QUESTIONS = 10;
     //final MediaPlayer rightAnswer = MediaPlayer.create(this, R.raw.rightanswersound);
     List<String> whatRandom = new ArrayList();
     List<String> allArray = new ArrayList();
@@ -37,14 +40,16 @@ public class GameActivity extends AppCompatActivity {
     boolean b = false;
     int n, rv;
     Bundle extras;
-    Button bo1, bo2, bo3;
+    Button bo1, bo2, bo3, startButton;
     TextView voprTV, failsTV, schTV, timeTV;
+    EditText countQuesET;
     File jsonFile = new File(Environment.getDataDirectory(), "");
     Intent intent;
     Timer timer = new Timer();
     private static final Object sMonitor = new Object();
     JSONObject jsonObject = new JSONObject();
     JSONArray jsonArray = new JSONArray();
+    RelativeLayout gameRL, setupRL;
     String[] s;
     int countTime = 0;
     int countTimeSec;
@@ -104,6 +109,26 @@ public class GameActivity extends AppCompatActivity {
         failsTV = (TextView) findViewById(R.id.fails);
         schTV = (TextView) findViewById(R.id.tvsch);
         timeTV = (TextView) findViewById(R.id.time);
+        setupRL = (RelativeLayout) findViewById(R.id.settingsRL);
+        gameRL = (RelativeLayout) findViewById(R.id.gameRL);
+        startButton = (Button) findViewById(R.id.startButton);
+        countQuesET = (EditText) findViewById(R.id.countQuestET);
+        showLayout(setupRL);
+        countQuesET.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                countQuesET.setText("");
+            }
+        });
+    }
+
+    public void onCliclStart(View v){
+        COUNT_OF_QUESTIONS = Integer.parseInt(countQuesET.getText().toString());
+        showLayout(gameRL);
+        initializeGame();
+    }
+
+    public void initializeGame(){
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -118,6 +143,7 @@ public class GameActivity extends AppCompatActivity {
         }, 0, 1000);
         writeText();
     }
+
     public void writeText(){
         randseed = new Random();
         seed = randseed.nextLong();
@@ -205,7 +231,7 @@ public class GameActivity extends AppCompatActivity {
             }else{
                 Intent i = new Intent(this, WinActivity.class);
                 i.putExtra("mistakes", o);
-                i.putExtra("time", Double.toString(countTime));
+                i.putExtra("time", Integer.toString(countTime));
                 i.putExtra("onlineMode", "offline");
                 startActivity(i);
                 finish();
@@ -236,4 +262,17 @@ public class GameActivity extends AppCompatActivity {
         }
         check();
     }
+
+    public void showLayout(RelativeLayout rl){
+        gameRL.setVisibility(View.GONE);
+        setupRL.setVisibility(View.GONE);
+        rl.setVisibility(View.VISIBLE);
+    }
+
+    public void showLayout(LinearLayout rl){
+        gameRL.setVisibility(View.GONE);
+        setupRL.setVisibility(View.GONE);
+        rl.setVisibility(View.VISIBLE);
+    }
+
 }

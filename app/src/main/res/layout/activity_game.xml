@@ -4,8 +4,61 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/mainmenugradient"
     tools:context=".GameActivity">
 
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible"
+        android:focusableInTouchMode="true"
+        android:focusable="true"
+        android:id="@+id/settingsRL">
+        <!--<EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/kostyl"/>-->
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/gradientbutton"
+            android:id="@+id/startButton"
+            android:layout_marginTop="100dp"
+            android:layout_centerHorizontal="true"
+            android:onClick="onCliclStart"
+            android:text="Начать"
+            android:textSize="20dp"
+            android:layout_alignTop="@+id/countQuestET"/>
+        <EditText
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:textSize="25dp"
+            android:inputType="number"
+            android:id="@+id/countQuestET"
+            android:nextFocusUp="@id/countQuestET"
+            android:nextFocusLeft="@id/countQuestET"
+            android:background="@drawable/gradientbutton"
+            android:layout_centerInParent="true"
+            android:textAlignment="center"
+            android:text="15"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textAlignment="center"
+            android:layout_alignBottom="@+id/countQuestET"
+            android:layout_marginBottom="50dp"
+            android:textColor="#000000"
+            android:text="Количество вопросов"
+            android:textSize="25dp"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/gameRL">
     <TextView
         android:id="@+id/tvquestion"
         android:layout_width="wrap_content"
@@ -38,6 +91,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:background="@drawable/gradientbutton"
         android:layout_marginTop="352dp"
         android:onClick="onClicl1O" />
 
@@ -47,7 +101,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/button1a"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="1dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/gradientbutton"
         android:onClick="onClicl2O" />
 
     <Button
@@ -56,7 +111,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/button2a"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="-2dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/gradientbutton"
         android:onClick="onClicl3O" />
 
     <TextView
@@ -75,5 +131,5 @@
         android:layout_alignParentBottom="true"
         android:textColor="#000000"
         android:textSize="25dp" />
-
+    </RelativeLayout>
 </RelativeLayout>

@@ -1,18 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:focusableInTouchMode="true"
+    android:focusable="true"
+    android:background="@drawable/mainmenugradient"
     tools:context=".SlovarActivity">
-
-    <include
-        android:id="@+id/toolbar"
-        layout="@layout/toolbar_slovari"></include>
-
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:layout_height="wrap_content">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/findET"/>
+        <ImageButton
+            android:layout_width="80dp"
+            android:layout_weight="1"
+            android:id="@+id/searchbtn"
+            android:onClick="onClickSearchbtn"
+            android:layout_height="40dp"
+            android:background="@drawable/magnifier"/>
+    </LinearLayout>
     <ListView
         android:layout_below="@+id/toolbar"
         android:id="@+id/listViewSlovar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></ListView>
-</RelativeLayout>
+
+
+</LinearLayout>

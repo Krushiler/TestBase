@@ -1,16 +1,24 @@
 package com.example.krushiler.testbase;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -35,6 +43,7 @@ public class SlovarActivity extends AppCompatActivity {
     ListView lv;
     EditText et;
     Toolbar toolbar;
+    ImageButton searchBTN;
 
     public String loadJSONFromAsset() {
         String json = null;
@@ -59,6 +68,21 @@ public class SlovarActivity extends AppCompatActivity {
         SimpleAdapter adapter;
 
         lv = (ListView) findViewById(R.id.listViewSlovar);
+        et = (EditText) findViewById(R.id.findET);
+        searchBTN = (ImageButton) findViewById(R.id.searchbtn);
+        et.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+                    return true;
+                }
+                return false;
+            }
+        });
         extras = getIntent().getExtras();
         extrasString = extras.getString("name");
         intent = getIntent();
@@ -92,49 +116,64 @@ public class SlovarActivity extends AppCompatActivity {
         }
         adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        et = (EditText) findViewById(R.id.findET);
-        et.setEnabled(false);
-        et.setEnabled(true);
+
         et.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence sa, int start, int before, int count) {
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                setAdapter(et.getText().toString());
             }
 
             @Override
-            public void afterTextChanged(Editable sa) {
-                int index = lv.getFirstVisiblePosition();
-                View v = lv.getChildAt(0);
-                int top = (v == null) ? 0 : (v.getTop() - lv.getPaddingTop());
-                boolean b = true;
-                String etText = et.getText().toString();
-                for (int i = 0; i < s.length; i += 2){
-                    b = true;
-                    if (etText.length()<=s[i].charAt(i)) {
-                        for (int j = 0; j < etText.length(); j++) {
-                            if (Character.toLowerCase(etText.charAt(j)) == Character.toLowerCase(s[i].charAt(j))) {
-                                continue;
-                            } else {
-                                b = false;
-                                break;
-                            }
-                        }
-                        if (b) {
-                            lv.setSelectionFromTop(i, top);
-                            Log.d("aaaa", s[i]);
-                            break;
-                        }
-                    }
-                }
+            public void afterTextChanged(Editable editable) {
+
             }
         });
-
     }
+    public void setAdapter(String so){
+        myArrList = new ArrayList<HashMap<String, String>>();
+        SimpleAdapter adapter;
+        adapter = new SimpleAdapter(
+                this,
+                myArrList,
+                R.layout.list_item_slovar,
+                new String[]{"q", "a"},
+                new int[]{R.id.text1, R.id.text2});
+        for (int i = 0; i < s.length; i+=2) {
+            if (s[i].toUpperCase().contains(so.toUpperCase())) {
+                HashMap<String, String> map;
+                map = new HashMap<String, String>();
+                map.put("q", s[i]);
+                map.put("a", s[i + 1]);
+                myArrList.add(map);
+            }
+        }
+        adapter.notifyDataSetChanged();
+        lv.setAdapter(adapter);
+    }
+
+    public void onClickSearchbtn(View v){
+        if (et.isFocused()){
+            et.clearFocus();
+            closeKeyboard();
+        }else{
+            et.requestFocus();
+            showKeyboard();
+        }
+    }
+
+    public void showKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
+    }
+
+    public void closeKeyboard(){
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(et.getWindowToken(), 0);
+    }
+
 }
