@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class SlovarActivity extends AppCompatActivity {
     Intent intent;
@@ -137,6 +138,7 @@ public class SlovarActivity extends AppCompatActivity {
     public void setAdapter(String so){
         myArrList = new ArrayList<HashMap<String, String>>();
         SimpleAdapter adapter;
+        List<Integer> teml = new ArrayList<Integer>();
         adapter = new SimpleAdapter(
                 this,
                 myArrList,
@@ -148,8 +150,24 @@ public class SlovarActivity extends AppCompatActivity {
                 HashMap<String, String> map;
                 map = new HashMap<String, String>();
                 map.put("q", s[i]);
-                map.put("a", s[i + 1]);
+                map.put("a", s[i+1]);
                 myArrList.add(map);
+                teml.add(i+1);
+            }
+        }
+        for (int i = 1; i < s.length; i+=2) {
+            boolean valid = true;
+            for (int j = 0; j < teml.size(); j++){
+                if (i == teml.get(j)){
+                    valid = false;
+                }
+            }
+            if (s[i].toUpperCase().contains(so.toUpperCase()) && valid) {
+                    HashMap<String, String> map;
+                    map = new HashMap<String, String>();
+                    map.put("q", s[i-1]);
+                    map.put("a", s[i]);
+                    myArrList.add(map);
             }
         }
         adapter.notifyDataSetChanged();

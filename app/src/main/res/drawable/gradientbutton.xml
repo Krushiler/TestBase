@@ -14,10 +14,10 @@ android:color="@color/colorPrimaryDark">
             android:radius="10dp"/>
         <gradient
             android:endColor="#7110"
-            android:startColor="#00FF00"
+            android:startColor="#449944"
             android:centerColor="#7110"
             android:type="radial"
-            android:gradientRadius="300dp"
+            android:gradientRadius="400dp"
             android:angle="90" />
     </shape>
 </item>

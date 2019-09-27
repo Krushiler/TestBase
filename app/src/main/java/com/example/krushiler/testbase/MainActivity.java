@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         if (item.getItemId() == R.id.spravka){
             final AlertDialog.Builder alertDialog = new AlertDialog.Builder(this);
             alertDialog.setTitle("Справка");
-            alertDialog.setMessage("Программа не требует интернет соединения\n\nНАЧАТЬ ИГРУ - игра с людьми, находящимися рядом с вами. Один игрок нажимает на кнопку \"хост\", остальные - на кнопку \"поиск\". По умолчанию 15 вопросов. Хост может изменить их количество \n\n" +
+            alertDialog.setMessage("Программа не требует интернет соединения\n\nНАЧАТЬ ИГРУ - игра с людьми, находящимися рядом с вами. Один игрок нажимает на кнопку \"хост\", остальные - на кнопку \"поиск\". По умолчанию 10 вопросов. Хост может изменить их количество \n\n" +
                     "ТРЕНИРОВКА - одиночная игра\n\n" +
                     "СЛОВАРИ - термины из тестов\n\n Разработчик - Lazarev Daniil");
             alertDialog.setIcon(R.drawable.information);
