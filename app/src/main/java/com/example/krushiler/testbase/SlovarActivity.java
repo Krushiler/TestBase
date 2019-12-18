@@ -135,6 +135,7 @@ public class SlovarActivity extends AppCompatActivity {
             }
         });
     }
+
     public void setAdapter(String so){
         myArrList = new ArrayList<HashMap<String, String>>();
         SimpleAdapter adapter;

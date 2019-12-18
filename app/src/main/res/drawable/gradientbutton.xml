@@ -13,9 +13,9 @@ android:color="@color/colorPrimaryDark">
         <corners
             android:radius="10dp"/>
         <gradient
-            android:endColor="#7110"
-            android:startColor="#449944"
-            android:centerColor="#7110"
+            android:endColor="#559955"
+            android:startColor="#33FF33"
+            android:centerColor="#559955"
             android:type="radial"
             android:gradientRadius="400dp"
             android:angle="90" />

@@ -357,6 +357,7 @@ public class NetworkGameActivity extends AppCompatActivity {
         if (!hasPermissions(this, REQUIRED_PERMISSIONS)) {
             requestPermissions(REQUIRED_PERMISSIONS, REQUEST_CODE_REQUIRED_PERMISSIONS);
         }
+
         connectionsClient = Nearby.getConnectionsClient(this);
 
         changeRL = (RelativeLayout) findViewById(R.id.changelayout);
