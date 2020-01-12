@@ -26,9 +26,11 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,8 +38,11 @@ import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.common.api.Releasable;
+import com.google.android.gms.common.util.PlatformVersion;
 import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.connection.AdvertisingOptions;
 import com.google.android.gms.nearby.connection.ConnectionInfo;
@@ -66,6 +71,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.SimpleTimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -121,11 +127,11 @@ public class NetworkGameActivity extends AppCompatActivity {
     //
     String resultsString = new String();
     String[] s;
-    int countTime = 0;
+    double countTime = 0;
     String extrasString, extrasWho;
     Map<String, String> opponentNames = new HashMap<String, String>();
     Map<String, Integer> opponentScores = new HashMap<String, Integer>();
-    Map<String, Integer> opponentTimes = new HashMap<String, Integer>();
+    Map<String, Double> opponentTimes = new HashMap<String, Double>();
     Map<String, Integer> opponentMessages = new HashMap<String, Integer>();
 
     JSONObject jsonObjectChange = new JSONObject();
@@ -134,6 +140,7 @@ public class NetworkGameActivity extends AppCompatActivity {
     String fileName;
     ArrayList<String> myArrList;
     ListView lv;
+    RecyclerView resultsLV;
 
     String TAG = "Nsd";
 
@@ -155,7 +162,7 @@ public class NetworkGameActivity extends AppCompatActivity {
     Button startBTN, cancelBTN, stopGameBTN;
 
     int messageCount = 0;
-    RelativeLayout changeRL, gameRL, networkRL, waitRL, hostRL, resultsRL, countDownRL, waitOthersStopRL;
+    RelativeLayout changeRL, gameRL, networkRL, waitRL, hostRL, resultsRL, countDownRL, waitOthersStopRL, nameLayout;
 
     String fnameforclient;
 
@@ -187,6 +194,30 @@ public class NetworkGameActivity extends AppCompatActivity {
                             showLayout(resultsRL);
                             resultsTV.setText(message);
                             messageCount = 0;
+                            String[] splited = message.split("\\s+");
+                            String pla="", nam="", mis="", tim="";
+                            ArrayList<PlayerStats> statsList = new ArrayList<>();
+                            for (int i = 0; i < splited.length; i++){
+                                if (i%4==0){
+                                    pla=splited[i];
+                                }else if (i%4==1){
+                                    nam=splited[i];
+                                }else if (i%4==2){
+                                    mis=splited[i];
+                                }else if (i%4==3){
+                                    tim=splited[i];
+                                    statsList.add(new PlayerStats(pla, nam, mis, tim));
+                                }
+                            }
+                            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(NetworkGameActivity.this);
+
+                            PlayerStatsAdapter adapter = new PlayerStatsAdapter(
+                                    statsList, NetworkGameActivity.this);
+
+                            resultsLV.addItemDecoration(new DividerItemDecoration(NetworkGameActivity.this));
+                            resultsLV.setLayoutManager(layoutManager);
+                            resultsLV.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
                         }
                     }
                     if (extrasWho == "host"){
@@ -200,7 +231,7 @@ public class NetworkGameActivity extends AppCompatActivity {
                             if (opponentMessages.get(endpointId) == 2) {
                                 opponentScores.put(endpointId, Integer.parseInt(message));
                             }else if (opponentMessages.get(endpointId)==3){
-                                opponentTimes.put(endpointId, Integer.parseInt(message));
+                                opponentTimes.put(endpointId, Double.parseDouble(message));
                                 getResults();
                             }
                         }
@@ -242,7 +273,6 @@ public class NetworkGameActivity extends AppCompatActivity {
                 
                 public void onConnectionResult(String endpointId, ConnectionResolution result) {
                     if (result.getStatus().isSuccess()) {
-                        codeName = nameET.getText().toString();
                         nameET.setEnabled(false);
                         Log.i(TAG, "onConnectionResult: connection successful");
                         connectionsClient.stopDiscovery();
@@ -376,6 +406,7 @@ public class NetworkGameActivity extends AppCompatActivity {
         resultsRL = (RelativeLayout) findViewById(R.id.resultsLayout);
         resultsTV = (TextView) findViewById(R.id.resultsTV);
         timeTV = (TextView) findViewById(R.id.timeTV);
+        nameLayout = (RelativeLayout) findViewById(R.id.namelayout);
         restartBTN = (Button) findViewById(R.id.restartBTN);
         cancelBTN = (Button) findViewById(R.id.cancelButton);
         stopGameBTN = (Button) findViewById(R.id.stopGameBTN);
@@ -384,6 +415,7 @@ public class NetworkGameActivity extends AppCompatActivity {
         countQestET = (EditText) findViewById(R.id.countQuestET);
         whatTestTV = (TextView) findViewById(R.id.whatTestTV);
         waitOthersStopRL = (RelativeLayout) findViewById(R.id.waitotherplayersstoprl);
+        resultsLV = (RecyclerView) findViewById(R.id.resultsLV);
 
         nameET.setOnKeyListener(new View.OnKeyListener() {
                                     @Override
@@ -393,7 +425,13 @@ public class NetworkGameActivity extends AppCompatActivity {
                                                 (keyCode == KeyEvent.KEYCODE_ENTER)) {
                                             InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                                             inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+                                            onClickEnterName(nameET);
                                             return true;
+                                        }
+                                        if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_SPACE)){
+                                            String sss = nameET.getText().toString();
+                                            sss = sss.substring(0, s.length-1);
+                                            nameET.setText(sss);
                                         }
                                         return false;
                                     }
@@ -634,7 +672,7 @@ public class NetworkGameActivity extends AppCompatActivity {
                     timer = new Timer();
                     if (extrasWho == "client") {
                         sendMessage(Integer.toString(o));
-                        sendMessage(Integer.toString(countTime));
+                        sendMessage(Double.toString(countTime));
                     }
                     if (extrasWho == "host") {
                         getResults();
@@ -770,11 +808,7 @@ public class NetworkGameActivity extends AppCompatActivity {
             sendMessage(Long.toString(seed));
         }
         final int[] nowTime = {4};
-        if ((COUNT_OF_QUESTIONS%10<=4 || COUNT_OF_QUESTIONS%10>0) && (COUNT_OF_QUESTIONS%100<10 || COUNT_OF_QUESTIONS%100>20)){
-            whatTestTV.setText(fnameforclient + "\n\n" + COUNT_OF_QUESTIONS + " вопроса");
-        }else {
-            whatTestTV.setText(fnameforclient + "\n\n" + COUNT_OF_QUESTIONS + " вопросов");
-        }
+        whatTestTV.setText(fnameforclient + "\n\n" + "Количество вопросов: " + COUNT_OF_QUESTIONS);
         countDownTV.setText("3");
         CountDownTimer waitTimer;
         waitTimer = new CountDownTimer(2500, 700) {
@@ -826,15 +860,16 @@ public class NetworkGameActivity extends AppCompatActivity {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                countTime+=1;
+                countTime+=0.1;
+                countTime=Math.rint(10.0 * countTime) / 10.0;
                 timeTV.post(new Runnable() {
                     @Override
                     public void run() {
-                        timeTV.setText(Integer.toString(countTime+o*10));
+                        timeTV.setText(Double.toString(countTime+o*10));
                     }
                 });
             }
-        }, 0, 1000);
+        }, 0, 100);
         /*CountDownTimer waitTimer;
         waitTimer = new CountDownTimer(5000, 300) {
 
@@ -889,7 +924,6 @@ public class NetworkGameActivity extends AppCompatActivity {
         countQestET.setText(Integer.toString(COUNT_OF_QUESTIONS));
         extrasWho = "host";
         restartBTN.setVisibility(View.VISIBLE);
-        codeName = nameET.getText().toString();
         showLayout(hostRL);
     }
 
@@ -952,6 +986,7 @@ public class NetworkGameActivity extends AppCompatActivity {
         changeRL.setVisibility(View.GONE);
         resultsRL.setVisibility(View.GONE);
         countDownRL.setVisibility(View.GONE);
+        nameLayout.setVisibility(View.GONE);
         rl.setVisibility(View.VISIBLE);
     }
 
@@ -963,6 +998,7 @@ public class NetworkGameActivity extends AppCompatActivity {
         changeRL.setVisibility(View.GONE);
         resultsRL.setVisibility(View.GONE);
         countDownRL.setVisibility(View.GONE);
+        nameLayout.setVisibility(View.GONE);
         rl.setVisibility(View.VISIBLE);
     }
 
@@ -971,7 +1007,7 @@ public class NetworkGameActivity extends AppCompatActivity {
         opponentMessages = new HashMap<String, Integer>();
         opponentNames.remove("me");
         opponentScores = new HashMap<String, Integer>();
-        opponentTimes = new HashMap<String, Integer>();
+        opponentTimes = new HashMap<String, Double>();
     }
 
     public void resetAll(){
@@ -979,7 +1015,7 @@ public class NetworkGameActivity extends AppCompatActivity {
         opponentMessages = new HashMap<String, Integer>();
         opponentNames = new HashMap<String, String>();
         opponentScores = new HashMap<String, Integer>();
-        opponentTimes = new HashMap<String, Integer>();
+        opponentTimes = new HashMap<String, Double>();
         opponentEndpointIds = new ArrayList<String>();
     }
 
@@ -993,11 +1029,14 @@ public class NetworkGameActivity extends AppCompatActivity {
             opponentScores.put("me", o);
             opponentNames.put("me", codeName);
             resultsString = "";
+
+            ArrayList<PlayerStats> statsList = new ArrayList<>();
+
             while(tempEndpoints.size()>0){
                 String bestEndpoint = new String(), nam = new String();
-                int minMis=10000, minTime=10000, minScore=10000;
+                int minMis=10000; double minTime=10000; double minScore=10000;
                 for (int i = 0; i < tempEndpoints.size(); i++){
-                    int mis = opponentScores.get(tempEndpoints.get(i)), tim = opponentTimes.get(tempEndpoints.get(i)), scor = tim + mis*10;
+                    int mis = opponentScores.get(tempEndpoints.get(i)); double tim = opponentTimes.get(tempEndpoints.get(i)); double scor = tim + mis*10;
                     if (scor<minScore){
                         minMis = mis;
                         minTime = tim;
@@ -1013,34 +1052,42 @@ public class NetworkGameActivity extends AppCompatActivity {
                     }
                 }
 
-                resultsString += hoho + ": " + opponentNames.get(bestEndpoint) + " Ошибки: " + minMis + " Время: " + minTime + "\n";
+                resultsString += hoho + " "+ opponentNames.get(bestEndpoint) + " " + minMis + " " + minTime + " ";
+
+                statsList.add(new PlayerStats(Integer.toString(hoho), opponentNames.get(bestEndpoint), Integer.toString(minMis), Double.toString(minTime)));
 
                 tempEndpoints.remove(bestEndpoint);
+
                 hoho ++;
+
+
             }
+
+            Log.d("MyRecycle", String.valueOf(statsList.size()));
+
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+
+            PlayerStatsAdapter adapter = new PlayerStatsAdapter(
+                    statsList, this);
+
+            //resultsLV.addItemDecoration(new DividerItemDecoration(NetworkGameActivity.this));
+            resultsLV.setLayoutManager(layoutManager);
+            resultsLV.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+
             resultsTV.setText(resultsString);
             sendMessage(resultsTV.getText().toString());
-
         }
     }
 
     public static int findIndex(String arr[], String t)
     {
-
-        // if array is Null
         if (arr == null) {
             return -1;
         }
-
-        // find length of array
         int len = arr.length;
         int i = 0;
-
-        // traverse in the array
         while (i < len) {
-
-            // if the i-th element is t
-            // then return the index
             if (arr[i] == t) {
                 return i;
             }
@@ -1050,4 +1097,14 @@ public class NetworkGameActivity extends AppCompatActivity {
         }
         return -1;
     }
+    public void onClickEnterName(View v){
+        codeName = nameET.getText().toString();
+        if(codeName.length()>0) {
+            ((TextView) findViewById(R.id.nameTextView)).setText(codeName);
+            showLayout(networkRL);
+        }else{
+            Toast.makeText(this, "Введите имя", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
+
