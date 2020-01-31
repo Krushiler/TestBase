@@ -104,6 +104,8 @@ public class NetworkGameActivity extends AppCompatActivity {
 
     private ConnectionsClient connectionsClient;
 
+    final String MESSAGE_CODE_FILENAMEFORCLIENT = "fnfcl", MESSAGE_CODE_FILENAME = "fname", MESSAGE_CODE_CODENAME = "cname", MESSAGE_CODE_MISSES = "cmiss", MESSAGE_CODE_COUNTTIME = "ctime", MESSAGE_CODE_SEED = "cseed", MESSAGE_CODE_COUNTOFQUESTIONS = "quest", MESSAGE_CODE_RESULTS = "mcres";
+
     int  o = 0, sch = 0, otv; // sch - counter    o - marks   otv - right answer
     int COUNT_OF_QUESTIONS = 10;
     //final MediaPlayer rightAnswer = MediaPlayer.create(this, R.raw.rightanswersound);
@@ -172,24 +174,34 @@ public class NetworkGameActivity extends AppCompatActivity {
                 @Override
                 public void onPayloadReceived(String endpointId, Payload payload) {
                     message = new String(payload.asBytes(), UTF_8);
+                    StringBuilder messageTypeBuilder = new StringBuilder();
+                    for (int i = 0; i < 5; i++){
+                        messageTypeBuilder.append(message.charAt(i));
+                    }
+                    String messageType = messageTypeBuilder.toString();
+                    StringBuilder tempmes = new StringBuilder();
+                    for (int i = 5; i < message.length(); i ++){
+                        tempmes.append(message.charAt(i));
+                    }
+                    message = tempmes.toString();
                     Log.i(TAG, message);
                     if (extrasWho=="client") {
                         messageCount++;
-                        if (messageCount == 1){
+                        if (messageType.equals(MESSAGE_CODE_COUNTOFQUESTIONS)){
                             COUNT_OF_QUESTIONS = Integer.parseInt(message);
                         }
-                        if (messageCount == 2) {
+                        if (messageType.equals(MESSAGE_CODE_FILENAME)) {
                             extrasString = message;
                             countTime = 0;
                             o = 0;
                         }
-                        else if (messageCount == 3) {
+                        else if (messageType.equals(MESSAGE_CODE_FILENAMEFORCLIENT)) {
                             fnameforclient = message;
                         }
-                        else if (messageCount == 4) {
+                        else if (messageType.equals(MESSAGE_CODE_SEED)) {
                             seed = Long.parseLong(message);
                             startGame();
-                        } else if (messageCount == 5){
+                        } else if (messageType.equals(MESSAGE_CODE_RESULTS)){
                             waitOhtersStop(true);
                             showLayout(resultsRL);
                             resultsTV.setText(message);
@@ -222,15 +234,15 @@ public class NetworkGameActivity extends AppCompatActivity {
                     }
                     if (extrasWho == "host"){
                         getResults();
-                        if (gameStage == "getNames"){
+                        if (messageType.equals(MESSAGE_CODE_CODENAME)){
                             opponentNames.put(endpointId, message);
                         }
-                        if (gameStage == "getScore") {
+                        else{
                             int tempcount = opponentMessages.containsKey(endpointId) ? opponentMessages.get(endpointId) : 1;
                             opponentMessages.put(endpointId, tempcount+1);
-                            if (opponentMessages.get(endpointId) == 2) {
+                            if (messageType.equals(MESSAGE_CODE_MISSES)) {
                                 opponentScores.put(endpointId, Integer.parseInt(message));
-                            }else if (opponentMessages.get(endpointId)==3){
+                            }else if (messageType.equals(MESSAGE_CODE_COUNTTIME)){
                                 opponentTimes.put(endpointId, Double.parseDouble(message));
                                 getResults();
                             }
@@ -310,8 +322,8 @@ public class NetworkGameActivity extends AppCompatActivity {
                                     fileName = s[position * 2 + 1];
                                     fnameforclient = s[position*2];
                                     onClickChangedGame();
-                                    sendMessage(fileName);
-                                    sendMessage(fnameforclient);
+                                    sendMessage(MESSAGE_CODE_FILENAME + fileName);
+                                    sendMessage(MESSAGE_CODE_FILENAMEFORCLIENT + fnameforclient);
                                     startGame();
                                 }
                             });
@@ -319,7 +331,7 @@ public class NetworkGameActivity extends AppCompatActivity {
                             connectionPB.setVisibility(View.INVISIBLE);
                             mRegisterBtn.setEnabled(false);
                             mDiscoverBtn.setEnabled(false);
-                            sendMessage(codeName);
+                            sendMessage(MESSAGE_CODE_CODENAME + codeName);
                         }
                     } else {
                         Log.i(TAG, "onConnectionResult: connection failed");
@@ -366,8 +378,8 @@ public class NetworkGameActivity extends AppCompatActivity {
                                 fileName = s[position * 2 + 1];
                                 fnameforclient = s[position*2];
                                 onClickChangedGame();
-                                sendMessage(fileName);
-                                sendMessage(fnameforclient);
+                                sendMessage(MESSAGE_CODE_FILENAME + fileName);
+                                sendMessage(MESSAGE_CODE_FILENAMEFORCLIENT + fnameforclient);
                                 startGame();
                             }
                         });
@@ -488,8 +500,8 @@ public class NetworkGameActivity extends AppCompatActivity {
                 fileName = s[position * 2 + 1];
                 fnameforclient = s[position*2];
                 onClickChangedGame();
-                sendMessage(fileName);
-                sendMessage(fnameforclient);
+                sendMessage(MESSAGE_CODE_FILENAME + fileName);
+                sendMessage(MESSAGE_CODE_FILENAMEFORCLIENT + fnameforclient);
                 startGame();
             }
         });
@@ -644,8 +656,10 @@ public class NetworkGameActivity extends AppCompatActivity {
         stopGameBTN.setEnabled(b);
         if (b==true) {
             waitOthersStopRL.setVisibility(View.GONE);
+            findViewById(R.id.resultsLV).setVisibility(View.VISIBLE);
         }else {
             waitOthersStopRL.setVisibility(View.VISIBLE);
+            findViewById(R.id.resultsLV).setVisibility(View.GONE);
         }
     }
 
@@ -671,8 +685,8 @@ public class NetworkGameActivity extends AppCompatActivity {
                     finishedGame = true;
                     timer = new Timer();
                     if (extrasWho == "client") {
-                        sendMessage(Integer.toString(o));
-                        sendMessage(Double.toString(countTime));
+                        sendMessage(MESSAGE_CODE_MISSES + Integer.toString(o));
+                        sendMessage(MESSAGE_CODE_COUNTTIME + Double.toString(countTime));
                     }
                     if (extrasWho == "host") {
                         getResults();
@@ -702,8 +716,8 @@ public class NetworkGameActivity extends AppCompatActivity {
                             fileName = s[position * 2 + 1];
                             fnameforclient = s[position*2];
                             onClickChangedGame();
-                            sendMessage(fileName);
-                            sendMessage(fnameforclient);
+                            sendMessage(MESSAGE_CODE_FILENAME + fileName);
+                            sendMessage(MESSAGE_CODE_FILENAMEFORCLIENT + fnameforclient);
                             startGame();
                         }
                     });
@@ -805,7 +819,7 @@ public class NetworkGameActivity extends AppCompatActivity {
             extrasString = fileName;
             randseed = new Random();
             seed = randseed.nextLong();
-            sendMessage(Long.toString(seed));
+            sendMessage(MESSAGE_CODE_SEED + Long.toString(seed));
         }
         final int[] nowTime = {4};
         whatTestTV.setText(fnameforclient + "\n\n" + "Количество вопросов: " + COUNT_OF_QUESTIONS);
@@ -902,7 +916,7 @@ public class NetworkGameActivity extends AppCompatActivity {
 
     public void onClickStartGame(View view){
         COUNT_OF_QUESTIONS = Integer.parseInt(countQestET.getText().toString());
-        sendMessage(Integer.toString(COUNT_OF_QUESTIONS));
+        sendMessage(MESSAGE_CODE_COUNTOFQUESTIONS + Integer.toString(COUNT_OF_QUESTIONS));
         startGameByHost();
     }
 
@@ -1076,7 +1090,7 @@ public class NetworkGameActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
 
             resultsTV.setText(resultsString);
-            sendMessage(resultsTV.getText().toString());
+            sendMessage(MESSAGE_CODE_RESULTS + resultsTV.getText().toString());
         }
     }
 
